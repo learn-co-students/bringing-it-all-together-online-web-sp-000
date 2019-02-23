@@ -19,19 +19,16 @@ class Dog
   end 
   
   def save 
-    # if self.id 
-    #   self.update 
-    # else 
+     
       sql = "INSERT INTO dogs (name, breed) VALUES (?, ?)" 
       DB[:conn].execute(sql, self.name, self.breed)
       @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
       return self
-    # end 
+    
   end 
   
   def self.create(hash)
-    @name = hash[:name]
-    @breed = hash[:breed]
+    
     new_student = self.new(name: hash[:name], breed: hash[:breed] )
     new_student.save 
   end 
@@ -42,22 +39,37 @@ class Dog
     end.first 
   end 
 
-  def self.find_or_create_by
+  def self.find_or_create_by(hash)
+    current_name = hash[:name]
+    current_breed = hash[:breed]
+    
+    
+    
+    found_dog_name = self.find_by_name(current_name)
+    
+    
+    
+    if found_dog_name == hash[:name] && found_dog_name.breed == hash[:breed]
+    
+      return self 
+    else 
+      self.new(name: hash[:name], breed: hash[:breed])
+    end
     
   end 
   
   def self.new_from_db(row) 
-    # id = 
-    # name = 
-    # breed = 
+     
     self.new(id: row[0], name: row[1], breed: row[2])
   end
   
   def self.find_by_name(name)
     
      sql = "SELECT * FROM dogs WHERE name = ?"
-    DB[:conn].execute(sql, name).map do |row| self.new_from_db(row) 
+    DB[:conn].execute(sql, name).map do |row| self.new_from_db(row)
+    
     end.first
+   
   end 
   
   def update 
