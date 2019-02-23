@@ -44,19 +44,32 @@ class Dog
     current_breed = hash[:breed]
     found_dog_name = self.find_by_name(current_name)
     
-    
-    if found_dog_name == nil
-      new_dog = self.new(name: hash[:name], breed: hash[:breed])
-      return new_dog
-    elsif found_dog_name != nil
-      if found_dog_name.name == hash[:name] && found_dog_name.breed != hash[:breed]
-        new_dog = self.new(name: hash[:name], breed: hash[:breed])
-       return new_dog
-      else
-        return found_dog_name
+    if found_dog_name == nil 
+      new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
+      return new_dog_add
+    elsif found_dog_name.name == current_name && found_dog_name.breed != current_breed
+        new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
+        binding.pry
+        return new_dog_add
          
-    end
-    end 
+      elsif found_dog_name.name == current_name && found_dog_name.breed == current_breed
+      return found_dog_name
+      
+    
+    
+    
+    # if found_dog_name == nil
+    #   new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
+    #   return new_dog_add
+    # elsif found_dog_name != nil
+    #   if found_dog_name.name == hash[:name] && found_dog_name.breed != hash[:breed]
+    #     new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
+    #   return new_dog_add
+    #   # else
+    #   #   return found_dog_name
+         
+    # end
+     end 
     
    
     end 
