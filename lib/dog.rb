@@ -19,18 +19,15 @@ class Dog
   end 
   
   def save 
-     
       sql = "INSERT INTO dogs (name, breed) VALUES (?, ?)" 
       DB[:conn].execute(sql, self.name, self.breed)
       @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
       return self
-    
   end 
   
   def self.create(hash)
-    
-    new_student = self.new(name: hash[:name], breed: hash[:breed] )
-    new_student.save 
+    new_dog = self.new(name: hash[:name], breed: hash[:breed] )
+    new_dog.save 
   end 
   
   def self.find_by_id(id)
@@ -42,60 +39,42 @@ class Dog
   def self.find_or_create_by(hash)
     current_name = hash[:name]
     current_breed = hash[:breed]
-    found_dog_name = self.find_by_name(current_name)
     
+   
+    
+    
+    
+    
+    
+    found_dog_name = self.find_by_name(current_name)
     if found_dog_name == nil 
-      new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
+     # new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
+      new_dog_add = create(hash)
       return new_dog_add
     elsif found_dog_name.name == current_name && found_dog_name.breed != current_breed
-        new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
-        binding.pry
+       # new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
+        new_dog_add = create(hash)
         return new_dog_add
-         
       elsif found_dog_name.name == current_name && found_dog_name.breed == current_breed
       return found_dog_name
-      
-    
-    
-    
-    # if found_dog_name == nil
-    #   new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
-    #   return new_dog_add
-    # elsif found_dog_name != nil
-    #   if found_dog_name.name == hash[:name] && found_dog_name.breed != hash[:breed]
-    #     new_dog_add = self.new(name: hash[:name], breed: hash[:breed])
-    #   return new_dog_add
-    #   # else
-    #   #   return found_dog_name
-         
-    # end
      end 
-    
-   
     end 
-   
   
-  def self.new_from_db(row) 
-     
+  def self.new_from_db(row)
     self.new(id: row[0], name: row[1], breed: row[2])
   end
   
   def self.find_by_name(name)
-    
-     sql = "SELECT * FROM dogs WHERE name = ?"
+    sql = "SELECT * FROM dogs WHERE name = ? LIMIT 1"
     DB[:conn].execute(sql, name).map do |row| self.new_from_db(row)
     
-     
-      
     end.first
-   
-  end 
+   end
   
   def update 
     sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
     DB[:conn].execute(sql, self.name, self.breed, self.id)
     self
-     
-  end 
+   end 
   
 end 
