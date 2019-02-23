@@ -42,21 +42,25 @@ class Dog
   def self.find_or_create_by(hash)
     current_name = hash[:name]
     current_breed = hash[:breed]
-    
-    binding.pry
-    
     found_dog_name = self.find_by_name(current_name)
     
     
-    
-    if found_dog_name == hash[:name] && found_dog_name.breed == hash[:breed]
-    
-      return self 
-    else 
-      self.new(name: hash[:name], breed: hash[:breed])
+    if found_dog_name == nil
+      new_dog = self.new(name: hash[:name], breed: hash[:breed])
+      return new_dog
+    elsif found_dog_name != nil
+      if found_dog_name.name == hash[:name] && found_dog_name.breed != hash[:breed]
+        new_dog = self.new(name: hash[:name], breed: hash[:breed])
+       return new_dog
+      else
+        return found_dog_name
+         
     end
+    end 
     
-  end 
+   
+    end 
+   
   
   def self.new_from_db(row) 
      
@@ -68,6 +72,8 @@ class Dog
      sql = "SELECT * FROM dogs WHERE name = ?"
     DB[:conn].execute(sql, name).map do |row| self.new_from_db(row)
     
+     
+      
     end.first
    
   end 
@@ -76,13 +82,7 @@ class Dog
     sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
     DB[:conn].execute(sql, self.name, self.breed, self.id)
     self
+     
   end 
-  
- 
-    
-    
-    
-  
-  
   
 end 
