@@ -43,7 +43,7 @@ class Dog
     current_name = hash[:name]
     current_breed = hash[:breed]
     
-    
+    binding.pry
     
     found_dog_name = self.find_by_name(current_name)
     
