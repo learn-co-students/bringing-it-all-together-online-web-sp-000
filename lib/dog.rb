@@ -105,10 +105,6 @@ class Dog
 
 end
 
-
-
-
-
 =begin
 class Dog
 
