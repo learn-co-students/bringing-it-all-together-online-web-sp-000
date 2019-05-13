@@ -44,27 +44,44 @@ class Dog
     @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
 
    end
- end
+     self
+  end
 
- def update
+  def update
 
-    sql = "UPDATE dogs SET name = ?, breed= ? WHERE id = ?"
+    sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
     DB[:conn].execute(sql, self.name, self.breed, self.id)
 
   end
 
-  def self.find_by_name(name)
+  def self.create(arg)
 
-    sql = <<-SQL
-      SELECT * FROM dogs WHERE name = ? LIMIT 1
-    SQL
-
-    DB[:conn].execute(sql, name).map {|data_base_row| self.new_from_db(data_base_row)}[0]
+    self.new(arg).save
 
   end
 
-  def self.new_from_db(row)
-    self.new(row[0], row[1], row[2])
+  def self.find_by_id(id)
+
+    sql = <<-SQL
+      SELECT * FROM dogs WHERE id = ? LIMIT 1
+    SQL
+
+    dog = {}
+
+    DB[:conn].execute(sql, id).each do |element|
+      dog[:id] = element[0]
+      dog[:name] = element[1]
+      dog[:breed] = element[2]
+
+    end
+
+    self.new(dog)
+
+  end
+
+  def self.find_or_create_by(arg)
+    binding.pry
+
   end
 
 
