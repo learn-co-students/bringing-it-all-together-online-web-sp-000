@@ -66,21 +66,39 @@ class Dog
       SELECT * FROM dogs WHERE id = ? LIMIT 1
     SQL
 
+    self.new_from_db(DB[:conn].execute(sql, id)[0])
+
+  end
+
+  def self.find_or_create_by(arg)
+    dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ?", arg[:name], arg[:breed])[0]
+    if !dog.respond_to?(:'empty?')
+      self.new_from_db(dog)
+    else
+      self.create(arg)
+    end
+    self
+  end
+
+  def self.new_from_db(arg)
+
     dog = {}
 
-    DB[:conn].execute(sql, id).each do |element|
-      dog[:id] = element[0]
-      dog[:name] = element[1]
-      dog[:breed] = element[2]
-
-    end
+    dog[:id] = arg[0]
+    dog[:name] = arg[1]
+    dog[:breed] = arg[2]
 
     self.new(dog)
 
   end
 
-  def self.find_or_create_by(arg)
-    binding.pry
+  def self.find_by_name(name)
+
+    sql = <<-SQL
+      SELECT * FROM dogs WHERE name = ? LIMIT 1
+    SQL
+
+    self.new_from_db(DB[:conn].execute(sql, name)[0])
 
   end
 
