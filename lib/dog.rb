@@ -72,11 +72,9 @@ class Dog
 
   def self.find_or_create_by(arg)
     dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ?", arg[:name], arg[:breed])[0]
-    if dog.respond_to?(:'empty?')
-      self.new_from_db(dog)
-    else
-      self.create(arg)
-    end
+
+    dog.respond_to?(:'empty?') ? self.new_from_db(dog) : self.create(arg)
+
   end
 
   def self.new_from_db(arg)
