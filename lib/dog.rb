@@ -35,9 +35,19 @@ end
 
 
 def self.create(hash)
-  dog=Dog.new(name,breed)
+  dog=Dog.new(hash)
   dog.save
   dog
+end
+
+def self.find_by_id(id)
+   sql=<<-SQL
+      SELECT * FROM dogs WHERE id=?
+   SQL
+   #DB[:conn].results_as_hash = true
+   binding.pry
+   hash=DB[:conn].execute(sql,id)[0]
+   Dog.new(hash)
 end
 
 end
