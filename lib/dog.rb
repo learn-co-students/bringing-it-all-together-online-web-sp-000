@@ -17,6 +17,10 @@ class Dog
     self
   end
 
+  def self.find_or_create_by(name:, breed:)
+
+  end
+
   def self.find_by_id(id)
     sql = <<-SQL
       SELECT *
