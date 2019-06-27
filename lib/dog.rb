@@ -57,49 +57,25 @@ class Dog
   end 
   
   def self.new_from_db(row)
-  	new_dog = self.new 
-  	new_dog.id = id:row[0]
-  	new_dog.name =  name:row[1]
-  	new_dog.breed = breed:row[2]
-  	new_dog    
+  	pat = Dog.new(id:row[0],name:row[1],breed:row[2])
+  	pat    
   end
   
+  def self.find_by_name(name)
+    sql = <<-SQL
+      SELECT *
+      FROM dogs
+      WHERE name = ?
+      LIMIT 1
+    SQL
+ 
+    DB[:conn].execute(sql, name).map do |row|
+      self.new_from_db(row)
+    end.first
+  end
+  
+  def update
+    sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
+    DB[:conn].execute(sql, self.name, self.breed, self.id)
+  end
 end
-
-=begin
-
-  describe '.new_from_db' do
-    it 'creates an instance with corresponding attribute values' do
-      row = [1, "Pat", "poodle"]
-      pat = Dog.new_from_db(row)
-
-      expect(pat.id).to eq(row[0])
-      expect(pat.name).to eq(row[1])
-      expect(pat.breed).to eq(row[2])
-    end
-  end
-
-  describe '.find_by_name' do
-    it 'returns an instance of dog that matches the name from the DB' do
-      teddy.save
-      teddy_from_db = Dog.find_by_name("Teddy")
-
-      expect(teddy_from_db.name).to eq("Teddy")
-      expect(teddy_from_db.id).to eq(1)
-      expect(teddy_from_db).to be_an_instance_of(Dog)
-    end
-  end
-
-  describe '#update' do
-    it 'updates the record associated with a given instance' do
-      teddy.save
-      teddy.name = "Teddy Jr."
-      teddy.update
-      teddy_jr = Dog.find_by_name("Teddy Jr.")
-      expect(teddy_jr.id).to eq(teddy.id)
-    end
-
-  end
-
-end
-=end
