@@ -35,4 +35,22 @@ class Dog
     new
   end
 
+  def self.new_from_db(array)
+    hash = {
+      :id => array[0],
+      :name => array[1],
+      :breed => array[2]
+    }
+    self.new(hash)
+  end
+
+  def self.find_by_id(rec_id)
+    sql = <<-SQL
+      SELECT * FROM dogs WHERE id = ?
+    SQL
+    DB[:conn].execute(sql, rec_id).map do |r|
+      self.new_from_db(r)
+    end.first
+  end
+
 end
