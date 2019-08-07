@@ -6,6 +6,13 @@ class Dog
     self.id ||= nil
   end
 
+  def update
+    sql = <<-SQL
+      UPDATE dogs SET name = ?, breed = ? WHERE id = ?
+    SQL
+    DB[:conn].execute(sql, self.name, self.breed, self.id)
+  end
+
   def self.create_table
     sql = <<-SQL
       CREATE TABLE IF NOT EXISTS dogs (id INTEGER PRIMARY KEY)
@@ -49,6 +56,28 @@ class Dog
       SELECT * FROM dogs WHERE id = ?
     SQL
     DB[:conn].execute(sql, rec_id).map do |r|
+      self.new_from_db(r)
+    end.first
+  end
+
+  def self.find_or_create_by(name:, breed:)
+    sql = <<-SQL
+      SELECT * FROM dogs WHERE name = ? AND breed = ?
+    SQL
+    record = DB[:conn].execute(sql, name, breed).first
+    if record
+      new_dog = self.new_from_db(record)
+    else
+      new_dog = self.create({:name => name, :breed => breed})
+    end
+    new_dog
+  end
+
+  def self.find_by_name(name)
+    sql = <<-SQL
+      SELECT * FROM dogs WHERE name = ?
+    SQL
+    DB[:conn].execute(sql, name).map do |r|
       self.new_from_db(r)
     end.first
   end
