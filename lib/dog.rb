@@ -3,9 +3,9 @@ class Dog
     attr_accessor :id, :name, :breed
 
     def initialize(dog_hash)
-        @id = id
-        @name = name
-        @breed = breed
+        @id = dog_hash[:id]
+        @name = dog_hash[:name]
+        @breed = dog_hash[:breed]
     end
 
     def self.create_table
@@ -26,10 +26,14 @@ class Dog
 
 
     def self.new_from_db(row) # looks at the DB row and assigns a new object
-        new_dog = self.new(nil)
-        new_dog.id = row[0]
-        new_dog.name = row[1]
-        new_dog.breed = row[2]
+        
+        dog_hash = {
+            id: row[0],
+            name: row[1],
+            breed: row[2]
+        }
+        new_dog = self.new(dog_hash)
+    
         new_dog
     end 
     
@@ -41,6 +45,18 @@ class Dog
         DB[:conn].execute(sql, name).map do |row| self.new_from_db(row)
         end.first
     end
+
+    def self.find_by_id(id_search)
+        sql = <<-SQL
+        SELECT * from dogs 
+        WHERE id= ?
+        SQL
+        DB[:conn].execute(sql, id_search).map do |row| self.new_from_db(row)
+        end.first
+    end
+
+
+
 
     def update
         sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
@@ -57,8 +73,42 @@ class Dog
         SQL
         DB[:conn].execute(sql, self.name, self.breed)
         @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
-    
+        end
+        self
     end
+
+
+    def self.create(dog_hash)
+        new_dog = self.new(dog_hash)
+        new_dog.save
+        new_dog
+    end
+
+
+    def self.find_or_create_by(name:, breed:)
+        dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ?", name, breed)
+        if !dog.empty?
+            puts dog[0]
+            dog_hash = {
+                id: dog[0][0],
+                name: dog[0][1],
+                breed: dog[0][2]
+            }
+            dog = Dog.new(dog_hash)
+        else
+
+            dog = Dog.create({name:name, breed: breed})
+        end
+    end
+
+            
+        
+
+
+
+
+
+
 
 
 
