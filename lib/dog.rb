@@ -24,6 +24,16 @@ class Dog
     DB[:conn].execute('DROP TABLE IF EXISTS dogs')
   end
   
+  def self.new_from_db(row)
+    Dog.new(name:row[1],breed:row[2],id:row[0])
+  end
+  
+  def self.create(name:, breed:)
+    dog = Dog.new(name:name, breed:breed)
+    dog.save
+    dog
+  end
+  
   def save
     if self.id
       self.update
@@ -34,9 +44,22 @@ class Dog
     self
   end
   
+  def self.find_by_name(name)
+    sql = "SELECT * FROM dogs WHERE name == ? LIMIT 1;"
+    row = DB[:conn].execute(sql, name).first
+    Dog.new_from_db(row)
+  end
+
+  def self.find_by_id(id)
+    sql = "SELECT * FROM dogs WHERE id == ? LIMIT 1;"
+    row = DB[:conn].execute(sql, id).first
+    Dog.new_from_db(row)
+  end
+
 
   def update
     sql = "UPDATE dogs SET name == ?, breed == ?  WHERE id == ?"
     DB[:conn].execute(sql, @name, @breed, @id)
+    self
   end
 end
