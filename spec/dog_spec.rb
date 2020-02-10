@@ -134,7 +134,7 @@ describe "Dog" do
     it 'returns an instance of dog that matches the name from the DB' do
       teddy.save
       teddy_from_db = Dog.find_by_name("Teddy")
-
+      
       expect(teddy_from_db.name).to eq("Teddy")
       expect(teddy_from_db.id).to eq(1)
       expect(teddy_from_db).to be_an_instance_of(Dog)
