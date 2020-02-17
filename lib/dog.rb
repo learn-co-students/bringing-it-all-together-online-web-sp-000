@@ -40,8 +40,42 @@ class Dog
         @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
         Dog.new(id: @id, name: self.name, breed: self.breed)
     end 
-
-    def self.find_by_name 
+    
+    def self.create(dog_attributes)
+      # takes in a hash of attributes and uses metaprogramming to 
+      # create a new dog object. Then it uses the #save method to save that
+      new_dog = Dog.new(name: dog_attributes[:name], breed: dog_attributes[:breed])
+      new_dog.save 
     end 
 
+    def self.find_by_id(id)
+      sql = <<-SQL
+        SELECT * FROM dogs WHERE id = ?
+      SQL
+      dog_id = nil 
+      DB[:conn].execute(sql, id).each do |dog_row|
+        dog_id = self.new_from_db(dog_row)
+      end 
+      dog_id 
+    end 
+    
+    def self.find_or_create_by(name: , breed:)
+      dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ?", name, breed)
+      if !dog.empty? 
+        dog_data = dog[0]
+        dog = Dog.new(id: dog_data[0], name: dog_data[1], breed: dog_data[2])
+      else 
+        dog = Dog.create(name: name, breed: breed)
+      end 
+      dog 
+    end 
+
+
 end 
+
+
+
+
+
+
+
