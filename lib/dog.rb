@@ -69,9 +69,29 @@ class Dog
       end 
       dog 
     end 
+    
+    def self.find_by_name(name)
+      sql = "SELECT * FROM dogs WHERE name = ?"
+      dog_name = nil
+      DB[:conn].execute(sql, name).select do |dog_row|
+        dog_name = self.new_from_db(dog_row)
+      end 
+      dog_name
+    end 
+    
+    def update 
+      sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
+      DB[:conn].execute(sql, self.name, self.breed, self.id)
+      #binding.pry 
+    end 
 
 
 end 
+
+
+
+
+
 
 
 
