@@ -26,7 +26,8 @@ class Dog
 
   def self.new_from_db(arr)
     arr.each do |row|
-      Dog.new(row)
+      row_hash = {:id => result[0], :name => result[1], :breed => result[2]}
+      Dog.new(row_hash)
     end
   end
 
