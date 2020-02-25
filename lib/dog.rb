@@ -24,11 +24,9 @@ class Dog
     DB[:conn].execute(sql)
   end
 
-  def self.new_from_db(arr)
-    arr.each do |row|
-      row_hash = {:id => result[0], :name => result[1], :breed => result[2]}
-      Dog.new(row_hash)
-    end
+  def self.new_from_db(row)
+    row_hash = {:id => row[0], :name => row[1], :breed => row[2]}
+    Dog.new(row_hash)
   end
 
   def self.find_by_name(name)
@@ -74,6 +72,15 @@ class Dog
     self
   end
 
-  def find_or_create_by(name)
+  def self.find_or_create_by(attr_hash)
+    dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ?", attr_hash[:name], attr_hash[:breed]).flatten
+    dog_hash = {:id => dog[0], :name => dog[1], :breed => dog[2]}
+    if !dog.empty?
+      new_dog = Dog.new(dog_hash)
+      new_dog
+    else
+      new_dog = Dog.create(dog_hash)
+      new_dog
+    end
   end
 end
