@@ -39,6 +39,8 @@ class Dog
 
   def self.find_by_id(id)
     #return new dog object by id
+    sql = "SELECT * FROM dogs WHERE id = ?"
+    result = DB[:conn].execute(sql, id).flatten
   end
 
   def self.create(name:, breed:)
@@ -48,20 +50,21 @@ class Dog
   end
 
   def update
-    if self.id
-      sql = "INSERT INTO dogs (name, breed) VALUES (?, ?) WHERE id = ?"
-      DB[:conn].execute(sql, self.name, self.breed, self.id)
-    else
-      self.save
-    end
+    sql = "UPDATE dogs SET name = ?, breed = ? WHERE id = ?"
+    DB[:conn].execute(sql, self.name, self.breed, self.id)
+    self
   end
 
   def save
-    sql = <<-SQL
-    INSERT INTO dogs (name, breed) VALUES (?, ?)
-    SQL
-    DB[:conn].execute(sql, self.name, self.breed)
-    @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
+    if self.id
+      self.update
+    else
+      sql = <<-SQL
+      INSERT INTO dogs (name, breed) VALUES (?, ?)
+      SQL
+      DB[:conn].execute(sql, self.name, self.breed)
+      @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
+    end
     self
   end
 
