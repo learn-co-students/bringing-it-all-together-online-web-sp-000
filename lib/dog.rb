@@ -1,9 +1,7 @@
+require 'pry'
+
 class Dog
   attr_accessor :name, :breed, :id
-
-  # def initialize(id: nil, name:, breed:)
-  #   @id, @name, @breed = id, name, breed
-  # end
 
   def initialize(attributes)
     attributes.each {|key, value| self.send(("#{key}="), value)}
@@ -27,8 +25,8 @@ class Dog
   end
 
   def self.new_from_db(arr)
-    arr.each do |dog|
-      Dog.create(dog)
+    arr.each do |row|
+      Dog.new(row)
     end
   end
 
@@ -37,18 +35,21 @@ class Dog
     SELECT * FROM dogs WHERE name = ?
     SQL
     result = DB[:conn].execute(sql, name).flatten
-    new_dog = Dog.new(result)
+    result_hash = {:id => result[0], :name => result[1], :breed => result[2]}
+    new_dog = Dog.new(result_hash)
     new_dog
   end
 
   def self.find_by_id(id)
-    #return new dog object by id
     sql = "SELECT * FROM dogs WHERE id = ?"
     result = DB[:conn].execute(sql, id).flatten
+    result_hash = {:id => result[0], :name => result[1], :breed => result[2]}
+    new_dog = Dog.new(result_hash)
+    new_dog
   end
 
-  def self.create(name:, breed:)
-    new_dog = Dog.new(name, breed)
+  def self.create(attr_hash)
+    new_dog = Dog.new(attr_hash)
     new_dog.save
     new_dog
   end
