@@ -1,11 +1,8 @@
 class Dog
-  attr_accessor :name, :breed
-  attr_reader :id
+  attr_accessor :name, :breed, :id
 
-  def initialize(params)
-    @id = nil
-    @name = params[name]
-    @breed = params[breed]
+  def initialize(id: nil, name:, breed:)
+    @id, @name, @breed = id, name, breed
   end
 
   def self.create_table
@@ -45,6 +42,9 @@ class Dog
   end
 
   def self.create(name:, breed:)
+    new_dog = Dog.new(name, breed)
+    new_dog.save
+    new_dog
   end
 
   def update
