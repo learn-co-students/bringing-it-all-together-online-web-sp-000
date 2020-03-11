@@ -8,3 +8,6 @@ gem 'rspec'
 
 # Debugging
 gem 'pry'
+
+# Coding
+gem 'solargraph'
