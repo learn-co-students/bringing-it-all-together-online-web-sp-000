@@ -73,7 +73,7 @@ class Dog
 
   def self.find_or_create_by(params)
     if params[:id]
-      dog = Dog.find_by_id(params[:id])
+      # dog = Dog.find_by_id(params[:id])
     else
       dog = Dog.create(params)
     end
