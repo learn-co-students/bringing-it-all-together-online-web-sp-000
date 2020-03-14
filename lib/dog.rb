@@ -72,11 +72,17 @@ class Dog
   end
 
   def self.find_or_create_by(params)
-    if params[:id]
-      # dog = Dog.find_by_id(params[:id])
+    #search db for params name + breed. should find id.
+    sql = "SELECT * FROM dogs WHERE name = ? AND breed = ?"
+    doggo_id = DB[:conn].execute(sql, params[:name], params[:breed])
+    #if id, generate Dog, no need to create
+    if doggo_id != []
+      doggo_id = doggo_id[0][0]
+      found_dog = Dog.find_by_id(doggo_id)
+    #if not id, create dog
     else
-      dog = Dog.create(params)
+      found_dog = Dog.create(params)
     end
-    dog
+    found_dog
   end
 end
