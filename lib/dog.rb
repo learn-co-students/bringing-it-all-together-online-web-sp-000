@@ -39,5 +39,18 @@ class Dog
         end
         self
     end
+# similar to the ORM update lab but with keyword arguments
+    def self.create(name:, breed:)
+        dog = Dog.new(name: name, breed: breed)
+        dog.save
+        dog
+    end
+
+    def self.new_from_db(row)
+        id = row[0]
+        name = row[1]
+        breed = row[2]
+        self.new(id: id, name: name, breed: breed)
+    end
 
 end
