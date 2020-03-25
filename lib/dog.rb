@@ -1,16 +1,22 @@
 
-
 class Dog
 
     attr_accessor :name, :breed
     attr_reader :id
     @@all = []
 
-    def initialize(id = nil, name, breed)
+    def initialize(id: nil, name:, breed:)
       @id = id
       @name = name
       @breed = breed
       @@all << self
+    end
+
+    def self.create(hash)
+        dog = Dog.new(hash)
+        hash.each{|k,v| dog.send(("{k}="), v)}
+        dog.save
+        dog
     end
 
     def self.create_table
@@ -27,7 +33,7 @@ class Dog
 
     def self.drop_table
       sql= <<-SQL
-      DROP TABLE dogs
+      DROP TABLE IF EXISTS dogs
       SQL
       DB[:conn].execute(sql) #execute SQL statement on database table
     end
@@ -71,6 +77,7 @@ class Dog
               DB[:conn].execute(sql, self.name, self.breed)
               @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
           end
+          self
     end
 
 end
