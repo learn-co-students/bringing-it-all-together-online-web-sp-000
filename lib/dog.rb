@@ -13,12 +13,16 @@ class Dog
   end
 
   def self.drop_table
-    DB[:conn].execute("DROP TABLE dogs")
+    DB[:conn].execute("DROP TABLE IF EXISTS dogs")
   end
 
   def save
+    if self.id
+      self.update
+    else
     DB[:conn].execute("INSERT INTO dogs (name, breed) VALUES (?, ?)", self.name, self.breed)
     @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
+    end
     self
   end
 
@@ -36,13 +40,14 @@ class Dog
   end
 
   def self.find_by_id(id)
-    sql = "SELECT * FROM dogs WHERE id = ?"
-    result = DB[:conn].execute(sql, id)[0]
-    Dog.new(id: result[0], name: result[1], breed: result[2])
+    sql = "SELECT * FROM dogs WHERE id = ? LIMIT 1"
+    DB[:conn].execute(sql,id).map do |row|
+      self.new_from_db(row)
+    end.first
   end
 
   def self.find_or_create_by(name:, breed:)
-    dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? and breed = ?", name, breed)
+    dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? and breed = ? LIMIT 1", name, breed)
     if !dog.empty?
       dog_data = dog[0]
       dog = Dog.new(id:dog_data[0], name:dog_data[1], breed:dog_data[2])
@@ -53,9 +58,10 @@ class Dog
   end
 
   def self.find_by_name(name)
-    sql = "SELECT * FROM dogs WHERE name = ?"
-    result = DB[:conn].execute(sql, name)[0]
-    Dog.new(id: result[0], name: result[1], breed: result[2])
+    sql = "SELECT * FROM dogs WHERE name = ? LIMIT 1"
+    DB[:conn].execute(sql,name).map do |row|
+      self.new_from_db(row)
+    end.first
   end
 
   def update
