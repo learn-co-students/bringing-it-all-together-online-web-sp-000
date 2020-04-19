@@ -1,8 +1,10 @@
 require 'pry'
 
 class Dog
+
     attr_accessor :name, :breed
     attr_reader :id
+
     def initialize(id: nil, name:, breed:)
         @id = id
         @name = name 
@@ -30,8 +32,8 @@ class Dog
         self
     end
 
-    def self.create(hash)
-            dog = self.new(hash)
+    def self.create(name: name, breed: breed)
+            dog = self.new(name: name, breed: breed)
             dog.save
     end
 
@@ -46,6 +48,7 @@ class Dog
         Select * From dogs
         WHERE id = ?
         SQL
+
         DB[:conn].execute(sql, id).map do |row|
             self.new_from_db(row)
         end.first
@@ -60,7 +63,7 @@ class Dog
 
         if dog.empty?
 
-            new_dog = self.create(:name => name, :breed => breed)
+            new_dog = self.create(name: name, breed: breed)
             
         else
             new_dog = self.new_from_db(dog[0])
@@ -86,8 +89,5 @@ class Dog
         SQL
         DB[:conn].execute(sql, self.name, self.breed, self.id)
     end
-
-
-
 
 end
