@@ -26,8 +26,8 @@ class Dog
         Dog.new(id: record[0], name: record[1], breed: record[2])
     end
 
-    def self.create(id: nil, name:, breed:)
-        dog = Dog.new(id: id, name: name, breed: breed)
+    def self.create(name:, breed:)
+        dog = Dog.new(name: name, breed: breed)
         dog.save
         dog
     end
@@ -40,6 +40,18 @@ class Dog
         else
             Dog.create(name: name, breed: breed)
         end
+    end
+
+    def self.find_by_name(name)
+        sql = "SELECT * FROM dogs WHERE name=?"        
+        record = DB[:conn].execute(sql, name)[0]
+        Dog.new_from_db(record)
+    end
+
+    def self.find_by_id(id)
+        sql = "SELECT * FROM dogs WHERE id=?"
+        record = DB[:conn].execute(sql, id)[0]
+        Dog.new_from_db(record)
     end
 
     def save
@@ -56,17 +68,5 @@ class Dog
     def update
         sql = "UPDATE dogs SET name=?, breed=? WHERE id=?"
         DB[:conn].execute(sql, self.name, self.breed, self.id)
-    end
-
-    def self.find_by_name(name)
-        sql = "SELECT * FROM dogs WHERE name=?"        
-        record = DB[:conn].execute(sql, name)[0]
-        Dog.new_from_db(record)
-    end
-
-    def self.find_by_id(id)
-        sql = "SELECT * FROM dogs WHERE id=?"
-        record = DB[:conn].execute(sql, id)[0]
-        Dog.new_from_db(record)
     end
 end
