@@ -79,21 +79,37 @@ class Dog
         FROM dogs
         WHERE dogs.name = ?
         SQL
-
         row = DB[:conn].execute(sql, name)
         if !row
          return   Dog.new(name:name, breed:breed)
         else
         a = row.select{|x| x.include?("#{breed}")}
         a.flatten!
-        id = a[0]
-        name = a[0]
-        breed = a[0]
-        dog = self.new(name:name, breed:breed, id:id)
-        binding.pry
+        ids = a[0]
+        names = a[1]
+        breeds = a[2]
+        end
+        if ids == nil
+           dog =  Dog.new(name:name, breed:breed)
+           dog.save
+           return dog
+        else
+        dog = self.new(name:names, breed:breeds, id:ids)
         return dog
         end
-         
     end
 
+    def self.find_by_name(text)
+        sql = <<-SQL
+        SELECT *
+        FROM dogs
+        WHERE dogs.name = ?
+        SQL
+
+        row = DB[:conn].execute(sql, text)
+            row.flatten!
+            self.new_from_db(row)
+        
+    end
+        
 end
