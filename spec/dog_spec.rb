@@ -85,7 +85,6 @@ describe "Dog" do
     it 'creates an instance with corresponding attribute values' do
       row = [1, "Pat", "poodle"]
       pat = Dog.new_from_db(row)
-
       expect(pat.id).to eq(row[0])
       expect(pat.name).to eq(row[1])
       expect(pat.breed).to eq(row[2])
@@ -106,7 +105,6 @@ describe "Dog" do
     it 'creates an instance of a dog if it does not already exist' do
       dog1 = Dog.create(name: 'teddy', breed: 'cockapoo')
       dog2 = Dog.find_or_create_by(name: 'teddy', breed: 'cockapoo')
-
       expect(dog2.id).to eq(dog1.id)
     end
     it 'when two dogs have the same name and different breed, it returns the correct dog' do
