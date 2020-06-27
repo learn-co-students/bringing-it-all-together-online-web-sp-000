@@ -3,7 +3,7 @@ class Dog
   attr_reader :id
 
   def initialize(id: id, name: name, breed: breed)
-    @id = id
+    @id = nil
     @name = name
     @breed = breed
   end
@@ -35,16 +35,42 @@ class Dog
     self
   end
 
-  def self.create
+  def self.create(name: name, breed: breed)
+    dog = Dog.new(name: name, breed: breed)
+    dog.save
+  end
+
+  def self.new_from_db(row)
+    new_dog = self.new
+    # new_dog.id = row[0]
+    new_dog.name = row[1]
+    new_dog.breed = row[2]
+    new_dog
+  end
+
+
+  def self.find_by_id(id)
+    sql = "SELECT * FROM dogs WHERE id = ?"
+    result = DB[:conn].execute(sql, id)[0]
+    Dog.new(result[0], result[1], result[2])
+  end
+
+  def self.find_or_create_by
+    dog = DB[:conn].execute("SELECT * FROM dogs WHERE name ? AND breed ?", name, breed)
+    if !dog.empty?
+      dog_data = dog[0]
+      dog = Dog.new(dog_data[0], dog_data[1], dog_data[2])
+    else
+      dog = Dog.create(name: name, breed: breed)
+    end
+    dog
+  end
+
+  def find_by_name
+  end
+
+  def update
+
   end
 
 end
-
-
-  # def self.new_from_db(row)
-  #   new_dog = self.new
-  #   new_dog.name = row[0]
-  #   new_dog.breed = row[1]
-  #   new_dog.id = row[2]
-  #   new_dog
-  # end
