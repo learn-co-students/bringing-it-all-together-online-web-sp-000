@@ -32,6 +32,7 @@ class Dog
       VALUES (?, ?)
     SQL
     DB[:conn].execute(sql, self.name, self.breed)
+    @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
     self
   end
 
@@ -60,7 +61,7 @@ class Dog
       dog_data = dog[0]
       dog = Dog.new(id: dog_data[0], name: dog_data[1], breed: dog_data[2])
     else
-      dog = Dog.create(id: nil, name: name, breed: breed)
+      dog = Dog.create(name: name, breed: breed)
     end
     dog
   end
