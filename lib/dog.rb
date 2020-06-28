@@ -1,6 +1,6 @@
 class Dog
-  attr_accessor :name, :breed
-  attr_reader :id
+  attr_accessor :id, :name, :breed
+  # attr_reader :id
 
   def initialize(id: id, name: name, breed: breed)
     @id = nil
@@ -42,7 +42,7 @@ class Dog
 
   def self.new_from_db(row)
     new_dog = self.new
-    # new_dog.id = row[0]
+    new_dog.id = row[0]
     new_dog.name = row[1]
     new_dog.breed = row[2]
     new_dog
@@ -51,8 +51,8 @@ class Dog
 
   def self.find_by_id(id)
     sql = "SELECT * FROM dogs WHERE id = ?"
-    result = DB[:conn].execute(sql, id)[0]
-    Dog.new(result[0], result[1], result[2])
+    result = DB[:conn].execute(sql, id)
+    Dog.new(result[0])
   end
 
   def self.find_or_create_by
@@ -66,11 +66,15 @@ class Dog
     dog
   end
 
-  def find_by_name
+  def find_by_name(name)
+    sql = "SELECT * FROM dogs WHERE name = ?"
+    result = DB[:conn].execute(sql, name)[0]
+    Dog.new(result[0], result[1], result[2])
   end
 
   def update
-
+    sql = "UPDATE dogs SET name = ?, breed = ? WHERE name = ?"
+    DB[:conn].execute(sql, self.name, self.breed)
   end
 
 end
