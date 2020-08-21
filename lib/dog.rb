@@ -23,22 +23,63 @@ class Dog
         DB[:conn].execute("DROP TABLE IF EXISTS dogs;")
     end
 
+    def save
+        sql = <<-SQL
+          INSERT INTO dogs (name, breed) 
+          VALUES (?, ?)
+        SQL
+        DB[:conn].execute(sql, self.name, self.breed)
+        @id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
+        self
+    end
+
+    def self.create(hash_of_attribute)
+        dog = Dog.new(hash_of_attribute)
+        dog.save
+        dog
+    end
+
     def self.new_from_db(row)
         dog = Dog.new(id: row[0], name: row[1], breed: row[2])
         dog
     end
 
-    def self.find_by_name(name)
+    def self.find_by_id(id)
         sql = <<-SQL
           SELECT * 
           FROM dogs
-          WHERE name = ?
+          WHERE id = ?
         SQL
-        DB[:conn].execute(sql, self.name).map do |row|
+        row = DB[:conn].execute(sql, id)[0]
+        self.new_from_db(row)
+    end
+
+    def self.find_or_create_by(name:, breed:)
+        sql = <<-SQL
+          SELECT * 
+          FROM dogs
+          WHERE name = ? AND breed = ?
+        SQL
+        found_dog = DB[:conn].execute(sql, name, breed)[0]
+        if found_dog
+            self.new_from_db(found_dog)
+        else
+            self.create({name:name, breed:breed})
+        end
+    end
+
+    def self.find_by_name(name)
+        sql = <<-SQL
+          SELECT * 
+          FROM dogs 
+          WHERE name = ? 
+        SQL
+        DB[:conn].execute(sql, name).map do |row|
             self.new_from_db(row)
         end.first
     end
 
-    def save
+    def update
     end
+
 end
