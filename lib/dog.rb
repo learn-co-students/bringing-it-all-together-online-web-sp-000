@@ -17,13 +17,12 @@ class Dog
         breed TEXT
       )
         SQL
-      DB[:conn].execute(sql) 
-  end
-
-  def save
+      DB[:conn].execute(sql)
   end
 
   def self.drop_table
+    sql = "DROP TABLE IF EXISTS dogs"
+    DB[:conn].execute(sql)
   end
 
   def self.create
@@ -39,6 +38,9 @@ class Dog
   end
 
   def self.find_by_name
+  end
+
+  def save
   end
 
   def update
