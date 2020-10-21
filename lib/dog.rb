@@ -1,9 +1,10 @@
 class Dog
   attr_accessor :id, :name, :breed
 
-  def initialize(attributes)
-    attributes.each {|key, value| self.send(("#{key}="), value)}
-    self.id ||= nil
+  def initialize(id: nil, name:, breed:)
+    @id = id
+    @name = name
+    @breed = breed
   end
 
   def self.create_table
@@ -23,31 +24,33 @@ class Dog
   end
 
   def save
+    if self.id
+      self.update
+    else
     sql = <<-SQL
       INSERT INTO dogs (name, breed) VALUES (?, ?)
       SQL
 
       DB[:conn].execute(sql, self.name, self.breed)
       @id = DB[:conn].execute('SELECT last_insert_rowid() FROM dogs')[0][0]
+    end
     self
   end
 
-  def self.create(hash_of_attributes)
-    dog = Dog.new(hash_of_attributes)
+  def self.create(name:, breed:)
+    dog = Dog.new(name: name, breed: breed)
     dog.save
   end
 
   def self.new_from_db(row)
-    attributes_hash = {
-      :id => row[0],
-      :name => row[1],
-      :breed => row[2]
-    }
-    self.new(attributes_hash)
+      id = row[0]
+      name = row[1]
+      breed = row[2]
+    self.new(id: id, name: name, breed: breed)
   end
 
   def self.find_by_id(id)
-    sql = 'SELECT * FROM dogs WHERE id = ?'
+    sql = 'SELECT * FROM dogs WHERE id = ? LIMIT 1'
     DB[:conn].execute(sql, id).map do |row|
       self.new_from_db(row)
     end.first
