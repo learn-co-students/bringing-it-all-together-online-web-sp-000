@@ -3,7 +3,7 @@ require 'pry'
 
 describe "Dog" do
 
-  let(:teddy) {Dog.new(name: "Teddy", breed: "cockapoo")}
+  let(:teddy) {Dog.new("Teddy", "cockapoo")}
 
   before(:each) do
     DB[:conn].execute("DROP TABLE IF EXISTS dogs")
@@ -19,7 +19,7 @@ describe "Dog" do
 
   describe "attributes" do
     it 'has a name and a breed' do
-      dog = Dog.new(name: "Fido", breed: "lab")
+      dog = Dog.new("Fido", "lab")
       expect(dog.name).to eq("Fido")
       expect(dog.breed).to eq("lab")
     end
@@ -27,26 +27,17 @@ describe "Dog" do
     it 'has an id that defaults to `nil` on initialization' do
       expect(teddy.id).to eq(nil)
     end
-
-    it 'accepts key value pairs as arguments to initialize' do
-      params = {id: 1, name: "Caldwell", breed: "toy poodle"}
-
-      dog = Dog.new(params)
-      expect(dog.name).to eq("Caldwell")
-      expect(dog.breed).to eq("toy poodle")
-    end
   end
 
-  describe ".create_table" do
+  describe "#create_table" do
     it 'creates the dogs table in the database' do
-      DB[:conn].execute("DROP TABLE IF EXISTS dogs")
       Dog.create_table
       table_check_sql = "SELECT tbl_name FROM sqlite_master WHERE type='table' AND tbl_name='dogs';"
       expect(DB[:conn].execute(table_check_sql)[0]).to eq(['dogs'])
     end
   end
 
-  describe ".drop_table" do
+  describe "#drop_table" do
     it 'drops the dogs table from the database' do
       Dog.drop_table
       table_check_sql = "SELECT tbl_name FROM sqlite_master WHERE type='table' AND tbl_name='dogs';"
@@ -55,12 +46,6 @@ describe "Dog" do
   end
 
   describe "#save" do
-    it 'returns an instance of the dog class' do
-      dog = teddy.save
-
-      expect(dog).to be_instance_of(Dog)
-    end
-
     it 'saves an instance of the dog class to the database and then sets the given dogs `id` attribute' do
       dog = teddy.save
 
@@ -68,7 +53,7 @@ describe "Dog" do
     end
   end
 
-  describe ".create" do
+  describe "#create" do
     it 'takes in a hash of attributes and uses metaprogramming to create a new dog object. Then it uses the #save method to save that dog to the database'do
       Dog.create(name: "Ralph", breed: "lab")
       expect(DB[:conn].execute("SELECT * FROM dogs")).to eq([[1, "Ralph", "lab"]])
@@ -81,17 +66,6 @@ describe "Dog" do
     end
   end
 
-  describe '.new_from_db' do
-    it 'creates an instance with corresponding attribute values' do
-      row = [1, "Pat", "poodle"]
-      pat = Dog.new_from_db(row)
-
-      expect(pat.id).to eq(row[0])
-      expect(pat.name).to eq(row[1])
-      expect(pat.breed).to eq(row[2])
-    end
-  end
-  
   describe '.find_by_id' do
     it 'returns a new dog object by id' do
       dog = Dog.create(name: "Kevin", breed: "shepard")
@@ -107,7 +81,7 @@ describe "Dog" do
       dog1 = Dog.create(name: 'teddy', breed: 'cockapoo')
       dog2 = Dog.find_or_create_by(name: 'teddy', breed: 'cockapoo')
 
-      expect(dog2.id).to eq(dog1.id)
+      expect(dog1.id).to eq(dog2.id)
     end
     it 'when two dogs have the same name and different breed, it returns the correct dog' do
       dog1 = Dog.create(name: 'teddy', breed: 'cockapoo')
@@ -128,10 +102,19 @@ describe "Dog" do
     end
   end
 
-  
+  describe '#new_from_db' do
+    it 'creates an instance with corresponding attribute values' do
+      row = [1, "Pat", "poodle"]
+      pat = Dog.new_from_db(row)
 
-  describe '.find_by_name' do
-    it 'returns an instance of dog that matches the name from the DB' do
+      expect(pat.id).to eq(row[0])
+      expect(pat.name).to eq(row[1])
+      expect(pat.breed).to eq(row[2])
+    end
+  end
+
+  describe '#find_by_name' do
+    it 'returns an instance of student that matches the name from the DB' do
       teddy.save
       teddy_from_db = Dog.find_by_name("Teddy")
 
@@ -145,7 +128,8 @@ describe "Dog" do
     it 'updates the record associated with a given instance' do
       teddy.save
       teddy.name = "Teddy Jr."
-      teddy.update
+      teddy.save
+
       teddy_jr = Dog.find_by_name("Teddy Jr.")
       expect(teddy_jr.id).to eq(teddy.id)
     end
