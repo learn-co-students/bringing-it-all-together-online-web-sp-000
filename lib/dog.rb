@@ -50,6 +50,8 @@ class Dog
       SQL
 
     DB[:conn].execute(sql, @name, @breed)
+
+    @id = DB[:conn].execute('SELECT last_insert_rowid() FROM dogs')[0][0]
     self
   end
 
@@ -76,7 +78,6 @@ class Dog
         name,
         breed,
       )
-    binding.pry
 
     if !dog.empty?
       dog_data = dog[0]
@@ -85,5 +86,13 @@ class Dog
       dog = self.create(name: name, breed: breed)
     end
     dog
+  end
+
+  def update
+    sql = <<-SQL
+    UPDATE dogs SET name = ?, breed = ? WHERE id = ?;
+    SQL
+
+    DB[:conn].execute(sql, @name, @breed, @id)
   end
 end
