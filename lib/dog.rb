@@ -1,3 +1,5 @@
+require 'pry'
+
 class Dog
   attr_accessor :name, :breed
   attr_reader :id
@@ -74,6 +76,7 @@ class Dog
         name,
         breed,
       )
+    binding.pry
 
     if !dog.empty?
       dog_data = dog[0]
